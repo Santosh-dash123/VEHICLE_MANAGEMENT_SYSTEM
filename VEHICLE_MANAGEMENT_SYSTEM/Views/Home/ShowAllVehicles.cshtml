@@ -1,0 +1,79 @@
+﻿@model List<VEHICLE_MANAGEMENT_SYSTEM.Models.VEHICLEINFO>
+
+<h3 class="text-danger text-center mt-5">LIST OF VEHICLE</h3>
+<table class="table table-striped mt-5">
+    <thead>
+        <tr>
+            <th></th>
+            <th>NAME</th>
+            <th>VEHICLE NUMBER</th>
+            <th>DISTRICT NAME</th>
+            <th>BLOCK NAME</th>
+            <th>TYPE OF VEHICLE</th>
+            <th>VEHICLE NAME</th>
+            <th>NO OF VEHICLE</th>
+            <th>DOCUMENT</th>
+            <th>ACTION</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            var count = 0;
+            foreach(var vehicle in Model)
+            {
+                count += 1;
+                        <tr>
+                            <td>@count</td>
+                            <td>@vehicle.NAME</td>
+                            <td>@vehicle.VEHICLE_ID</td>
+                            <td>@vehicle.DISTRICT_NAME</td>
+                            <td>@vehicle.BLOCK_NAME</td>
+                            <td>@vehicle.TYPE_OF_VEHICLE</td>
+                            <td>@vehicle.VEHICLE_NAME</td>
+                            <td>@vehicle.NO_OF_VEHICLE</td>
+                            <td>
+                                    <a class="btn btn-secondary" target="_blank" href="/Home/GetVehiclePhotoUsingId?id=@vehicle.ID"><i class="fa-solid fa-eye"></i></a>
+                            </td>
+                            <td>
+                                    <a href="/Home/Vehicle?id=@vehicle.ID" class="btn btn-success"><i class="fa-solid fa-pen-to-square"></i></a>
+                                                &nbsp;
+                                    <button type="button" class="btn btn-danger" onclick="deleteVehicle(@vehicle.ID)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    &nbsp;
+                                    <a href="/Home/GetDistrictUsingId?id=@vehicle.ID" class="btn btn-success"><i class="fa-solid fa-user"></i></a>
+                            </td>
+                        </tr>
+            }
+        }
+    </tbody>
+</table>
+<script src="~/jquery/jquery.js"></script>
+<script>
+    $(document).ready(function () {
+        $.noConflict();
+    })
+    function deleteVehicle(id) { 
+        $.ajax({
+            url: "/Home/Delete?id="+id,
+            type: "GET",
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                console.log(response.result);
+                Swal.fire({
+                    title: response.result,
+                    icon: "success",
+                    confirmButtonText: "Ok",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                })
+            },
+            error: function (error) {
+                alert("Some error is present please check console!");
+            }
+        });
+    }
+</script>

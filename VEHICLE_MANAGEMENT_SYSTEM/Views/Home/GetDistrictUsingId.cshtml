@@ -1,0 +1,22 @@
+﻿@model  List<VEHICLE_MANAGEMENT_SYSTEM.Entity.DISTRICT>
+
+<h3 class="text-danger text-center mt-3">LIST OF DISTRICT</h3>
+<table class="table table-bordered table-striped mt-3">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>NAME</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach(var item in Model)
+            {
+                <tr>
+                    <td>@item.ID</td>
+                    <td>@item.NAME</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

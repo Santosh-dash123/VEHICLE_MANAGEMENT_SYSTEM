@@ -1,0 +1,400 @@
+﻿@model VEHICLE_MANAGEMENT_SYSTEM.Models.VEHICLEDATAMODEL
+<h3 class="text-dange text-center mt-5 text-success">VEHICLE MANAGEMENT SYSTEM</h3>
+@{
+    if (Model.ID == 0)
+    {
+          <h3 style="text-align:center;" id="upper_text" class="text-danger mt-5">CREATE VEHICLE</h3>
+    }
+    else
+    {
+          <h3 style="text-align:center;" id="upper_text" class="text-danger mt-5">UPDATE VEHICLE</h3>
+    }
+}
+<a href="/Home/ShowAllVehicles" class="btn btn-primary"><i class="fa-solid fa-eye"></i></a>
+<div class="row mt-5">
+    <div class="col-lg-3">
+        <div class="form-group">
+            <label class="form-label">Name</label><span class="text-danger fw-bold">*</span>
+            @Html.HiddenFor(x => x.ID,new {@id="ID"})
+            @Html.TextBoxFor(x => x.NAME, new { @class = "form-control text-uppercase", @id = "NAME", @placeholder = "Enter your name", @autocomplete = "off" })
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="form-group">
+            <label class="form-label">District</label><span class="text-danger fw-bold">*</span>
+            @Html.DropDownListFor(x => x.D_ID, new SelectList(Model.SelectDistrict, "Value", "Text"),
+                     "--Select District--", new { @class = "form-control", @id = "D_ID" })
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="form-group">
+            <label class="form-label">Block</label><span class="text-danger fw-bold">*</span>
+            @{
+                if (Model.ID != 0)
+                {
+                     @Html.DropDownListFor(x => x.B_ID, Model.SelectBlock, new { @class = "form-control", @id = "B_ID", @name = "B_ID" })
+                }
+                else
+                {
+                    <select id="B_ID" class="form-control">
+                        <option value="">---Select Block---</option>
+
+                    </select>
+                }
+            }
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="form-group">
+            <label class="form-label">Types Of Vehicle</label><span class="text-danger fw-bold">*</span>
+            @{
+                if (Model.ID != 0)
+                {
+                     @Html.DropDownListFor(x => x.TOFVC, Model.SelectTofvc, new { @class = "form-control", @id = "TOFVC", @name = "TOFVC" })
+                }
+                else
+                {
+                    <select id="TOFVC" class="form-control">
+                        <option value="">---Select Types Of Vehicle---</option>
+
+                    </select>
+                }
+            }
+        </div>
+    </div>
+</div>
+<div class="row mt-5">
+    <div class="col-lg-3">
+        <div class="form-group">
+            <label class="form-label">Vehicle Name</label><span class="text-danger fw-bold">*</span>
+            @{
+                if (Model.ID != 0)
+                {
+                    @Html.DropDownListFor(x => x.VCNAME, Model.SelectVcname, new { @class = "form-control", @id = "VCNAME", @name = "VCNAME" })
+                }
+                else
+                {
+                    <select id="VCNAME" class="form-control">
+                        <option value="">---Select Vehicle Names---</option>
+
+                    </select>
+                }
+            }
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="form-group">
+            <label class="form-label">No Of Vehicles</label>
+            @Html.TextBoxFor(x => x.NOOFVC, new { @class = "form-control text-uppercase", @id = "NOOFVC", @placeholder = "Enter no of vehicles", @autocomplete = "off",@readonly="readonly",@value="" })
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="form-group" id="file-container">
+            <label for="file" class="form-label">Image</label>
+            @{
+                if(Model.FILE_ != null)
+                {    
+                      <br/>
+                      <img src="@Model.FILE_" height="50" width="50" class="img-fluid" id="FILE_IMG" />
+                }
+                else
+                {
+                      <input type="file" class="form-control" id="FILE_" name="FILE_" accept=".jpg, .png">
+                }
+            }
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="form-group d-flex justify-content-end" style="margin-top:2rem !important">
+            @{
+                if (Model.ID == 0)
+                {
+                      <button type="button" id="submit" onclick="saveData()" class="btn btn-primary" name="submit">SUBMIT</button>
+                }
+                else
+                {
+                      <button type="button" id="submit" onclick="saveData()" class="btn btn-primary" name="submit">UPDATE</button>
+                }
+            }
+            &nbsp;
+            @* <button type="reset" id="reset" class="btn btn-danger" onclick="window.location.reload()" name="reset">RESET</button> *@
+            <button type="reset" id="reset" class="btn btn-danger" onclick="clearAllFieldData();" name="reset">RESET</button>
+        </div>
+    </div>
+</div>
+<script src="~/jquery/jquery.js"></script>
+@* <script src="~/js/vehicle.js"></script> *@
+<script>
+    $(document).ready(function () {
+        $.noConflict();
+        $("#NAME").focus();
+
+        $("#D_ID").change(function () {
+            debugger;
+            var Id = $("#D_ID").val();
+            if (Id == null || Id == "") {
+                Swal.fire({
+                    title: "Please select a district!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "OK",
+                    cancelButtonText: "Cancel",
+                });
+            }
+            else {
+                $.ajax({
+                    url: "/Home/GetBlock/" + Id,
+                    type: "GET",
+                    success: function (response) {
+                        debugger;
+                        $("#B_ID").empty().append('<option value="">---Select Block---</option>');
+                        $.each(response, function (index, block) {
+                            debugger;
+                            $("#B_ID").append($(`<option value=${block.value}>${block.text}</option>`));
+                        })
+                    },
+                    error: function (error) {
+
+                    }
+                })
+            }
+        })
+
+        $("#B_ID").change(function () {
+            debugger;
+            var Id = $("#B_ID").val();
+            if (Id == null || Id == "") {
+                Swal.fire({
+                    title: "Please select a block!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "OK",
+                    cancelButtonText: "Cancel",
+                });
+            }
+            else {
+                $.ajax({
+                    url: "/Home/GetTypeOfVehicle/" + Id,
+                    type: "GET",
+                    success: function (response) {
+                        debugger;
+                        $("#TOFVC").empty().append('<option value="">---Select Types Of Vehicle---</option>');
+                        $.each(response, function (index, tofvc) {
+                            debugger;
+                            $("#TOFVC").append($(`<option value=${tofvc.value}>${tofvc.text}</option>`));
+                        })
+                    },
+                    error: function (error) {
+
+                    }
+                })
+            }
+        })
+
+        $("#TOFVC").change(function () {
+            debugger;
+            var Id = $("#TOFVC").val();
+            if (Id == null || Id == "") {
+                Swal.fire({
+                    title: "Please select type of vehicle!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "OK",
+                    cancelButtonText: "Cancel",
+                });
+            }
+            else {
+                $.ajax({
+                    url: "/Home/GetVehicleName/" + Id,
+                    type: "GET",
+                    success: function (response) {
+                        debugger;
+                        $("#VCNAME").empty().append('<option value="">---Select Types Of Vehicle---</option>');
+                        $.each(response, function (index, VCNAME) {
+                            debugger;
+                            $("#VCNAME").append($(`<option value=${VCNAME.value}>${VCNAME.text}</option>`));
+                        })
+                    },
+                    error: function (error) {
+
+                    }
+                })
+            }
+        })
+
+        $("#VCNAME").change(function () {
+            debugger;
+            var Id = $("#VCNAME").val();
+            if (Id == null || Id == "") {
+                Swal.fire({
+                    title: "Please select a vehicle name!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "OK",
+                    cancelButtonText: "Cancel",
+                });
+            }
+            else {
+                $.ajax({
+                    url: "/Home/GetNoOfVehicle/" + Id,
+                    type: "GET",
+                    success: function (response) {
+                        debugger;
+                        console.log(response);
+                        $("#NOOFVC").val(response);
+                    },
+                    error: function (error) {
+
+                    }
+                })
+            }
+        })
+    })
+
+    function ValidationCallForInfo(message) {
+        Swal.fire({
+            title: message,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "OK",
+            cancelButtonText: "Cancel",
+        });
+    }
+
+    function clearAllFieldData() {
+        $('#NAME').focus();
+        $('#ID').val('');
+        $('#NAME').val('');  
+        $('#D_ID').val('');  
+        $('#B_ID').empty().append('<option value="">---Select Block---</option>'); 
+        $('#TOFVC').empty().append('<option value="">---Select Types Of Vehicle---</option>'); 
+        $('#VCNAME').empty().append('<option value="">---Select Vehicle Names---</option>');
+        $('#NOOFVC').val('');
+        $('#FILE_').val('');
+        if ($("#FILE_IMG").length) { // Check if img tag is present
+            $('#FILE_IMG').remove(); // Remove the img tag
+            $('#file-container').append('<input type="file" class="form-control" id="FILE_" name="FILE_" accept=".jpg, .png">'); // Add input file tag
+        }
+        if ($("#submit").text() == "UPDATE") {
+            $("#submit").text('INSERT');
+            $("#upper_text").text('CREATE VEHICLE');
+        }
+    }
+
+
+    function chcekAllField() {
+        debugger;
+        if ($('#NAME').val().trim() === "" || $("#NAME").val().trim() == null) {
+            $('#NAME').focus();
+            // $('#NAME').next("label").remove();
+            // $('#NAME').after('<label class="error mt-2 text-danger"> Name cannot be blank! </label>');
+            ValidationCallForInfo('Name cannot be  blank!!');
+            return false;
+        }
+        if (!$('#D_ID').val()) {
+            debugger;
+            $('#D_ID').focus();
+            ValidationCallForInfo('District cannot be  blank!!');
+            return false;
+        }
+        if (!$('#B_ID').val() || $('#B_ID').val() === "") {
+            debugger;
+            $('#B_ID').focus();
+            ValidationCallForInfo('Block cannot be  blank!!');
+            return false;
+        }
+        if (!$('#TOFVC').val() || $('#TOFVC').val() === "") {
+            debugger;
+            $('#TOFVC').focus();
+            ValidationCallForInfo('Type of vehicle cannot be  blank!!');
+            return false;
+        }
+        if (!$('#VCNAME').val() || $('#VCNAME').val() === "") {
+            debugger;
+            $('#VCNAME').focus();
+            ValidationCallForInfo('Vehicle name cannot be  blank!!');
+            return false;
+        }
+        debugger;
+        if ($("#FILE_").length > 0 && $("#FILE_")[0].files.length > 0) {
+            debugger;
+            var imagepath = $("#FILE_").prop('files')[0];
+            if (imagepath) {
+                // var allowedFormats = ['image/jpeg', 'image/png', 'application/pdf'];
+                var allowedFormats = ['image/jpeg', 'image/png'];
+                if (!allowedFormats.includes(imagepath.type)) {
+                    $("#FILE_").focus();
+                    Swal.fire({
+                        title: "Please select a file with only jpg, png format!",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "OK",
+                        cancelButtonText: "Cancel",
+                    });
+                    return false;
+                }
+            }
+        }
+
+        // $('#NAME').on('keyup', function () {
+        //     if ($(this).val().trim() !== "") {
+        //         $(this).next("label.error").remove();
+        //     }
+        // });
+
+
+        return true;
+    }
+
+    function saveData() {
+        debugger;
+        if ($("#FILE_").val() == "" || $("#FILE_").val() == null) {
+            debugger;
+            var imagepath = null;
+        }
+        else {
+            debugger;
+            var imagepath = $("#FILE_").prop('files')[0]; // Get the file selected
+        }
+
+
+        var studentData = new FormData(); //This FormData is a built in javascript object that provides a way to easily
+        //construct a set of key/value pairs representing form fields and their values, which can then be sent with an AJAX request.
+
+        studentData.append('ID', $("#ID").val());
+        studentData.append('NAME', $("#NAME").val());
+        studentData.append('D_ID', $("#D_ID").val());
+        studentData.append('B_ID', $("#B_ID").val());
+        studentData.append('TOFVC', $("#TOFVC").val());
+        studentData.append('VCNAME', $("#VCNAME").val());
+        studentData.append('NOOFVC', $("#NOOFVC").val());
+        studentData.append('allinputpath', imagepath);
+
+        if (chcekAllField() == true) {
+            debugger;
+            $.ajax({
+                url: "/Home/Vehicle",
+                type: "POST",
+                data: studentData,
+                processData : false,
+                contentType : false,
+                success: function (response) {
+                    console.log(response.result);
+                    Swal.fire({
+                        title: response.result,
+                        icon: "success",
+                        confirmButtonText: "Ok",
+                    }).then((result) => {
+                        console.log(result);
+                        if (result.isConfirmed) {
+                            clearAllFieldData();
+                        }
+                    })
+                },
+                error: function (error) {
+                    alert("Some error is present please check console!");
+                }
+            });
+        }
+    }
+</script>

@@ -1,0 +1,22 @@
+﻿@using System.IO
+<div class="text-center">
+    @{
+        if (@ViewBag.extension == null || @ViewBag.extension == "" || @ViewBag.image_url == null || @ViewBag.image_url == "")
+        {
+            <h3 class="text-center text-danger">Photo is not present!</h3>
+        }
+        else
+        {
+            if (ViewBag.extension.ToLower() == ".pdf")
+            {
+                <object data="@ViewBag.image_url" type="application/pdf" width="100%" height="600px">
+                    <embed src="@ViewBag.image_url" type="application/pdf" />
+                </object>
+            }
+            else
+            {
+                <img src="@ViewBag.image_url" class="rounded" alt="...">
+            }
+        }
+    }
+</div>
